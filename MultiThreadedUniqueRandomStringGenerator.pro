@@ -16,12 +16,14 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     threadview.cpp \
     numberworker.cpp \
-    controller.cpp
+    controller.cpp \
+    taskperthread.cpp
 
 HEADERS  += mainwindow.h \
     threadview.h \
     numberworker.h \
-    controller.h
+    controller.h \
+    taskperthread.h
 
 FORMS    += mainwindow.ui \
     threadview.ui
