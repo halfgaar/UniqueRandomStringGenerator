@@ -5,12 +5,14 @@
 
 int NumberWorker::globalThreadCounter = 0;
 
-NumberWorker::NumberWorker(const TaskPerThread task, QThread &thread) :
+NumberWorker::NumberWorker(const TaskPerThread task, QThread &thread, QVector<qint64> &totalResultList) :
     QObject(0), // We can't have a parent, because then we can't move to a thread.
     n(task.getN()),
+    nOffset(task.getNOffset()),
     minInclusive(task.getMinInclusive()),
     maxExclusive(task.getMaxExclusive()),
-    mCancelled(false)
+    mCancelled(false),
+    mTotalResultList(totalResultList)
 {
     if (maxExclusive < n)
     {
@@ -26,10 +28,7 @@ NumberWorker::NumberWorker(const TaskPerThread task, QThread &thread) :
 void NumberWorker::doWork()
 {
     // Seed the local random generator.
-    unsigned long x = QDateTime::currentDateTime().toMSecsSinceEpoch();;
-
-    QVector<qint64> *result = new QVector<qint64>(n);
-    QSharedPointer<QVector<qint64> > managedPointer = QSharedPointer<QVector<qint64> >(result);
+    unsigned long x = QDateTime::currentDateTime().toMSecsSinceEpoch();; // TODO: not thread safe seed.
 
     // merely for the progress signals
     const int period = 10000;
@@ -40,14 +39,15 @@ void NumberWorker::doWork()
         // This is a well known linear congruential function for random number generation.
         // Doing it locally, to avoid slow function calls. It makes it marginally faster.
         x = 48271 * x;
-        const qint64 random = x % (i - minInclusive);
+        const qint64 random = x % (i - minInclusive); // TODO: random must be between min and max
 
         const qint64 candidateValue = maxExclusive - i;
 
         if (random < n)
         {
             n--;
-            (*result)[n] = candidateValue;
+            // the + part is necessary because all threads are writing their portion in the same result.
+            mTotalResultList[n+nOffset] = candidateValue;
 
             if (n % period == 0)
             {
@@ -68,7 +68,7 @@ void NumberWorker::doWork()
         return;
     }
 
-    emit resultReady(managedPointer);
+    emit resultReady();
 }
 
 void NumberWorker::cancel()

@@ -1,7 +1,8 @@
 #include "taskperthread.h"
 
-TaskPerThread::TaskPerThread(qint64 n, qint64 minInclusive, qint64 maxExclusive) :
+TaskPerThread::TaskPerThread(qint64 n, const int nOffset, qint64 minInclusive, qint64 maxExclusive) :
     n(n),
+    nOffset(nOffset),
     minInclusive(minInclusive),
     maxExclusive(maxExclusive)
 {
@@ -21,6 +22,11 @@ void TaskPerThread::appendMax(qint64 maxExlusive)
 qint64 TaskPerThread::getN() const
 {
     return n;
+}
+
+int TaskPerThread::getNOffset() const
+{
+    return nOffset;
 }
 
 qint64 TaskPerThread::getMinInclusive() const

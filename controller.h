@@ -6,6 +6,7 @@
 #include <QList>
 #include <numberworker.h>
 #include <taskperthread.h>
+#include <QVector>
 
 class Controller : public QObject
 {
@@ -14,6 +15,8 @@ class Controller : public QObject
     QList<NumberWorker*> mWorkers;
     const int mNoOfThreads;
     bool mRunning;
+    QVector<qint64> mResultList;
+    int mWorkersDone;
 
     QList<TaskPerThread> getTaskDivisions(const qint64 n, const qint64 maxExclusive);
 public:
@@ -32,7 +35,7 @@ signals:
     void stopped();
 
 private slots:
-    void handleWorkerResults(QSharedPointer<QVector<qint64> > result);
+    void handleWorkerResults();
 
 public slots:
 

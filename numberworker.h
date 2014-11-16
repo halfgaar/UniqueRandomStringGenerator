@@ -12,13 +12,15 @@ class NumberWorker : public QObject
     Q_OBJECT
 
     qint64 n;
+    const int nOffset;
     const qint64 minInclusive;
     const qint64 maxExclusive;
     bool mCancelled;
     static int globalThreadCounter;
     int mThreadID;
+    QVector<qint64> &mTotalResultList;
 public:
-    explicit NumberWorker(const TaskPerThread task, QThread &thread);
+    explicit NumberWorker(const TaskPerThread task, QThread &thread, QVector<qint64> &totalResultList);
     void cancel();
     int getThreadID() const;
 
@@ -27,7 +29,7 @@ public slots:
 
 signals:
     void progress(int value);
-    void resultReady(QSharedPointer<QVector<qint64> > result);
+    void resultReady();
     void error(QString error);
 
 public slots:

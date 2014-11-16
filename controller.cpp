@@ -16,7 +16,7 @@ QList<TaskPerThread> Controller::getTaskDivisions(const qint64 n, const qint64 m
     {
         qint64 min = segmentSize * i;
         qint64 max = min + segmentSize;
-        TaskPerThread task(nPerThread, min, max);
+        TaskPerThread task(nPerThread, i*nPerThread, min, max);
         result.append(task);
     }
 
@@ -29,7 +29,9 @@ QList<TaskPerThread> Controller::getTaskDivisions(const qint64 n, const qint64 m
 Controller::Controller(const qint64 n, const qint64 maxExclusive, QObject *parent) :
     QObject(parent),
     mNoOfThreads(QThread::idealThreadCount ()),
-    mRunning(false)
+    mRunning(false),
+    mResultList(n),
+    mWorkersDone(0)
 {
     qRegisterMetaType<QSharedPointer<QVector<qint64> > >("QSharedPointer<QVector<qint64> >");
 
@@ -37,7 +39,7 @@ Controller::Controller(const qint64 n, const qint64 maxExclusive, QObject *paren
     {
         QThread * thread = new QThread(this);
         mThreads.append(thread);
-        NumberWorker * worker = new NumberWorker(task, *thread);
+        NumberWorker * worker = new NumberWorker(task, *thread, mResultList);
         mWorkers.append(worker);
 
         connect(this, &Controller::operate, worker, &NumberWorker::doWork);
@@ -102,12 +104,20 @@ bool Controller::isRunning() const
     return mRunning;
 }
 
-void Controller::handleWorkerResults(QSharedPointer<QVector<qint64> > result)
+void Controller::handleWorkerResults()
 {
-    qDebug() << "Worker done. It returned " << result->count() << "numbers";
+    mWorkersDone++;
 
-    emit stopped();
-    mRunning = false;
+    if (mWorkersDone == mNoOfThreads)
+    {
+        foreach(qint64 value, mResultList)
+        {
+            qDebug() << value;
+        }
+
+        emit stopped();
+        mRunning = false;
+    }
 }
 
 
