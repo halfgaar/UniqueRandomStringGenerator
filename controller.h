@@ -38,6 +38,7 @@ public:
     void start();
     int getNrOfThreads();
     QList<NumberWorker*> getWorkers();
+    void cancel();
 
 signals:
     void operate();

@@ -12,8 +12,10 @@ class NumberWorker : public QObject
     qint64 n;
     const qint64 minInclusive;
     const qint64 maxExclusive;
+    bool mCancelled;
 public:
     explicit NumberWorker(qint64 n, qint64 minInclusive, qint64 maxExclusive, QObject *parent = 0);
+    void cancel();
 
 public slots:
     void doWork();

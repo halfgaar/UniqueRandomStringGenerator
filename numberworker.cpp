@@ -8,7 +8,8 @@ NumberWorker::NumberWorker(qint64 n, qint64 minInclusive, qint64 maxExclusive, Q
     QObject(parent),
     n(n),
     minInclusive(minInclusive),
-    maxExclusive(maxExclusive)
+    maxExclusive(maxExclusive),
+    mCancelled(false)
 {
     if (maxExclusive < n)
     {
@@ -30,7 +31,7 @@ void NumberWorker::doWork()
     const int period = 10000;
     const qint64 nStart = n;
 
-    for (qint64 i = maxExclusive; i > minInclusive; i--)
+    for (qint64 i = maxExclusive; i > minInclusive && !mCancelled; i--)
     {
         // This is a well known linear congruential function for random number generation.
         // Doing it locally, to avoid slow function calls. It makes it marginally faster.
@@ -52,6 +53,9 @@ void NumberWorker::doWork()
         }
     }
 
+    if (mCancelled)
+        return;
+
     if (n != 0)
     {
         QString message = QString("n = %1, which is not 0, so the algorithm has a bug.").arg(n);
@@ -61,5 +65,10 @@ void NumberWorker::doWork()
     }
 
     emit resultReady(managedPointer);
+}
+
+void NumberWorker::cancel()
+{
+    mCancelled = true;
 }
 

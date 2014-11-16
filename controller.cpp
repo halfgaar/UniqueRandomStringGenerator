@@ -82,6 +82,8 @@ Controller::Controller(const qint64 n, const qint64 maxExclusive, QObject *paren
 
 Controller::~Controller()
 {
+    cancel();
+
     foreach (QThread *thread, mThreads)
     {
         thread->quit();
@@ -90,6 +92,9 @@ Controller::~Controller()
 
     foreach (NumberWorker *worker, mWorkers)
     {
+        // We could use delete later, but that used to require an event loop, which we no longer have because we quit the thread. However,
+        // I think since qt 4.8, that also works without event loop. But, since no queued connections are anything of the sort are
+        // active anymore, we can just delete it now.
         delete worker;
     }
 }
@@ -107,6 +112,14 @@ int Controller::getNrOfThreads()
 QList<NumberWorker *> Controller::getWorkers()
 {
     return mWorkers;
+}
+
+void Controller::cancel()
+{
+    foreach (NumberWorker *worker, mWorkers)
+    {
+        worker->cancel();
+    }
 }
 
 void Controller::handleWorkerResults(QSharedPointer<QVector<qint64> > result)
