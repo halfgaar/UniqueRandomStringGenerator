@@ -15,9 +15,12 @@ class NumberWorker : public QObject
     const qint64 minInclusive;
     const qint64 maxExclusive;
     bool mCancelled;
+    static int globalThreadCounter;
+    int mThreadID;
 public:
     explicit NumberWorker(const TaskPerThread task, QThread &thread);
     void cancel();
+    int getThreadID() const;
 
 public slots:
     void doWork();

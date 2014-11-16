@@ -7,6 +7,7 @@ ThreadView::ThreadView(NumberWorker *numberWorker, QWidget *parent) :
 {
     ui->setupUi(this);
     connect(numberWorker, &NumberWorker::progress, this, &ThreadView::setValue);
+    ui->label->setText(QString("Thread %1").arg(numberWorker->getThreadID()));
 }
 
 ThreadView::~ThreadView()

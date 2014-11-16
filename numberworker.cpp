@@ -3,6 +3,7 @@
 #include <QDebug>
 #include <QDateTime>
 
+int NumberWorker::globalThreadCounter = 0;
 
 NumberWorker::NumberWorker(const TaskPerThread task, QThread &thread) :
     QObject(0), // We can't have a parent, because then we can't move to a thread.
@@ -19,6 +20,7 @@ NumberWorker::NumberWorker(const TaskPerThread task, QThread &thread) :
     }
 
     moveToThread(&thread);
+    mThreadID = globalThreadCounter++;
 }
 
 void NumberWorker::doWork()
@@ -72,5 +74,10 @@ void NumberWorker::doWork()
 void NumberWorker::cancel()
 {
     mCancelled = true;
+}
+
+int NumberWorker::getThreadID() const
+{
+    return mThreadID;
 }
 
