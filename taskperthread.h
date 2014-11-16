@@ -10,9 +10,9 @@ public:
     void appendN(qint64 n);
     void appendMax(qint64 maxExlusive);
 
-    qint64 getN();
-    qint64 getMinInclusive();
-    qint64 getMaxExclusive();
+    qint64 getN() const;
+    qint64 getMinInclusive() const;
+    qint64 getMaxExclusive() const;
 
 private:
     qint64 n;

@@ -18,17 +18,17 @@ void TaskPerThread::appendMax(qint64 maxExlusive)
     this->maxExclusive += maxExlusive;
 }
 
-qint64 TaskPerThread::getN()
+qint64 TaskPerThread::getN() const
 {
     return n;
 }
 
-qint64 TaskPerThread::getMinInclusive()
+qint64 TaskPerThread::getMinInclusive() const
 {
     return minInclusive;
 }
 
-qint64 TaskPerThread::getMaxExclusive()
+qint64 TaskPerThread::getMaxExclusive() const
 {
     return maxExclusive;
 }

@@ -34,17 +34,15 @@ Controller::Controller(const qint64 n, const qint64 maxExclusive, QObject *paren
 
     foreach(TaskPerThread task, getTaskDivisions(n, maxExclusive))
     {
-        NumberWorker * worker = new NumberWorker(task.getN(), task.getMinInclusive(), task.getMaxExclusive());
         QThread * thread = new QThread(this);
-        worker->moveToThread(thread);
+        mThreads.append(thread);
+        NumberWorker * worker = new NumberWorker(task, *thread);
+        mWorkers.append(worker);
 
         connect(this, &Controller::operate, worker, &NumberWorker::doWork);
         connect(worker, &NumberWorker::resultReady, this, &Controller::handleWorkerResults);
         connect(worker, &NumberWorker::error, this, &Controller::error);
         thread->start();
-
-        mWorkers.append(worker);
-        mThreads.append(thread);
     }
 }
 

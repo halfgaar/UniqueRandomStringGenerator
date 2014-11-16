@@ -4,6 +4,8 @@
 #include <QObject>
 #include <QVector>
 #include <QSharedPointer>
+#include <taskperthread.h>
+#include <QThread>
 
 class NumberWorker : public QObject
 {
@@ -14,7 +16,7 @@ class NumberWorker : public QObject
     const qint64 maxExclusive;
     bool mCancelled;
 public:
-    explicit NumberWorker(qint64 n, qint64 minInclusive, qint64 maxExclusive, QObject *parent = 0);
+    explicit NumberWorker(const TaskPerThread task, QThread &thread);
     void cancel();
 
 public slots:

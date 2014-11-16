@@ -4,11 +4,11 @@
 #include <QDateTime>
 
 
-NumberWorker::NumberWorker(qint64 n, qint64 minInclusive, qint64 maxExclusive, QObject *parent) :
-    QObject(parent),
-    n(n),
-    minInclusive(minInclusive),
-    maxExclusive(maxExclusive),
+NumberWorker::NumberWorker(const TaskPerThread task, QThread &thread) :
+    QObject(0), // We can't have a parent, because then we can't move to a thread.
+    n(task.getN()),
+    minInclusive(task.getMinInclusive()),
+    maxExclusive(task.getMaxExclusive()),
     mCancelled(false)
 {
     if (maxExclusive < n)
@@ -17,6 +17,8 @@ NumberWorker::NumberWorker(qint64 n, qint64 minInclusive, qint64 maxExclusive, Q
         qDebug() << message;
         emit error(message);
     }
+
+    moveToThread(&thread);
 }
 
 void NumberWorker::doWork()
