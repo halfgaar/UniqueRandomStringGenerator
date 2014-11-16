@@ -28,7 +28,8 @@ QList<TaskPerThread> Controller::getTaskDivisions(const qint64 n, const qint64 m
 
 Controller::Controller(const qint64 n, const qint64 maxExclusive, QObject *parent) :
     QObject(parent),
-    mNoOfThreads(QThread::idealThreadCount ())
+    mNoOfThreads(QThread::idealThreadCount ()),
+    mRunning(false)
 {
     qRegisterMetaType<QSharedPointer<QVector<qint64> > >("QSharedPointer<QVector<qint64> >");
 
@@ -67,7 +68,12 @@ Controller::~Controller()
 
 void Controller::start()
 {
+    if (mRunning)
+        return;
+
+    mRunning = true;
     emit operate(); // Not calling stuff directly on the worker because it's been moved to another thread. Instead using this queued connection.
+    emit started();
 }
 
 int Controller::getNrOfThreads()
@@ -86,11 +92,22 @@ void Controller::cancel()
     {
         worker->cancel();
     }
+
+    emit stopped();
+    mRunning = false;
+}
+
+bool Controller::isRunning() const
+{
+    return mRunning;
 }
 
 void Controller::handleWorkerResults(QSharedPointer<QVector<qint64> > result)
 {
     qDebug() << "Worker done. It returned " << result->count() << "numbers";
+
+    emit stopped();
+    mRunning = false;
 }
 
 

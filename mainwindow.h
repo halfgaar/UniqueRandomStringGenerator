@@ -14,12 +14,16 @@ class MainWindow : public QMainWindow
 
     Controller &mController;
 
+    void updateInterfaceMode();
+
 public:
     explicit MainWindow(Controller &c, QWidget *parent = 0);
     ~MainWindow();
 
 private slots:
     void on_btnGenerate_clicked();
+    void onControllerStarted();
+    void onControllerStopped();
 
 private:
     Ui::MainWindow *ui;

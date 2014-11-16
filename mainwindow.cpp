@@ -3,6 +3,7 @@
 #include <threadview.h>
 #include <numberworker.h>
 
+
 MainWindow::MainWindow(Controller &c, QWidget *parent) :
     QMainWindow(parent),
     mController(c),
@@ -16,6 +17,8 @@ MainWindow::MainWindow(Controller &c, QWidget *parent) :
         ui->threadsView->addWidget(tView);
     }
 
+    connect(&c, &Controller::started, this, &MainWindow::onControllerStarted);
+    connect(&c, &Controller::stopped, this, &MainWindow::onControllerStopped);
 }
 
 MainWindow::~MainWindow()
@@ -23,7 +26,29 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::updateInterfaceMode()
+{
+    bool buttonsEnabled = true;
+
+    if (mController.isRunning())
+    {
+        buttonsEnabled = false;
+    }
+
+    ui->btnGenerate->setEnabled(buttonsEnabled);
+}
+
 void MainWindow::on_btnGenerate_clicked()
 {
     mController.start();
+}
+
+void MainWindow::onControllerStarted()
+{
+    updateInterfaceMode();
+}
+
+void MainWindow::onControllerStopped()
+{
+    updateInterfaceMode();
 }

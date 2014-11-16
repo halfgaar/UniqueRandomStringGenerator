@@ -13,7 +13,7 @@ class Controller : public QObject
     QList<QThread*> mThreads;
     QList<NumberWorker*> mWorkers;
     const int mNoOfThreads;
-
+    bool mRunning;
 
     QList<TaskPerThread> getTaskDivisions(const qint64 n, const qint64 maxExclusive);
 public:
@@ -23,10 +23,13 @@ public:
     int getNrOfThreads();
     QList<NumberWorker*> getWorkers();
     void cancel();
+    bool isRunning() const;
 
 signals:
     void operate();
     void error(QString message);
+    void started();
+    void stopped();
 
 private slots:
     void handleWorkerResults(QSharedPointer<QVector<qint64> > result);
