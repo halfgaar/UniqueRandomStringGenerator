@@ -2,6 +2,32 @@
 #include <QDebug>
 #include <taskperthread.h>
 
+/**
+ * @brief Controller::getTaskDivisions generates a list of ranges for each thread to work on.
+ * @param n is the amount of numbers to pick
+ * @param maxExclusive is the exclusive upper limit,
+ * @return
+ *
+ * Note: as it is now, the list has an aesthetic/cosmetic Endian-like issue. The algorithm works backwards, but the segments are
+ * distributed forwards. This is hard-ish to solve because the last thread gets the remainder from an uneven division, making it hard
+ * to inverse the nOffset.
+ *
+ * So, this is an example list (for the trained eye; yes, with random seeding issue):
+ *
+ * 24 -> created by thread 1
+ * 14 -> created by thread 1.
+ * 49 -> created by thread 2.
+ * 39 -> created by thread 2.
+ * 74 -> created by thread 3.
+ * 64 -> created by thread 3.
+ * 99 -> created by thread 4.
+ * 93 -> created by thread 4.
+ * 89 -> created by thread 4.
+ * 79 -> created by thread 4.
+ *
+ * If you were to sort descending by thread number but keep the order per thread, you get the order as a single thread version
+ * of the algorithm would have created. In other words, a list of unique descending values.
+ */
 QList<TaskPerThread> Controller::getTaskDivisions(const qint64 n, const qint64 maxExclusive)
 {
     QList<TaskPerThread> result;

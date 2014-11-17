@@ -39,9 +39,9 @@ void NumberWorker::doWork()
         // This is a well known linear congruential function for random number generation.
         // Doing it locally, to avoid slow function calls. It makes it marginally faster.
         x = 48271 * x;
-        const qint64 random = x % (i - minInclusive); // TODO: random must be between min and max
+        const qint64 random = x % (i - minInclusive);
 
-        const qint64 candidateValue = maxExclusive - i;
+        const qint64 candidateValue = maxExclusive - i + minInclusive;
 
         if (random < n)
         {
