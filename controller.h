@@ -7,6 +7,7 @@
 #include <numberworker.h>
 #include <taskperthread.h>
 #include <QVector>
+#include <threadsaferandom.h>
 
 class Controller : public QObject
 {
@@ -17,6 +18,7 @@ class Controller : public QObject
     bool mRunning;
     QVector<qint64> mResultList;
     int mWorkersDone;
+    ThreadSafeRandom mTsRandom;
 
     QList<TaskPerThread> getTaskDivisions(const qint64 n, const qint64 maxExclusive);
 public:

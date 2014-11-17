@@ -65,7 +65,7 @@ Controller::Controller(const qint64 n, const qint64 maxExclusive, QObject *paren
     {
         QThread * thread = new QThread(this);
         mThreads.append(thread);
-        NumberWorker * worker = new NumberWorker(task, *thread, mResultList);
+        NumberWorker * worker = new NumberWorker(task, *thread, mResultList, mTsRandom.next());
         mWorkers.append(worker);
 
         connect(this, &Controller::operate, worker, &NumberWorker::doWork);

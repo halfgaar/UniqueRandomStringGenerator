@@ -5,7 +5,7 @@
 
 int NumberWorker::globalThreadCounter = 0;
 
-NumberWorker::NumberWorker(const TaskPerThread task, QThread &thread, QVector<qint64> &totalResultList) :
+NumberWorker::NumberWorker(const TaskPerThread task, QThread &thread, QVector<qint64> &totalResultList, qint64 randSeed) :
     QObject(0), // We can't have a parent, because then we can't move to a thread.
     n(task.getN()),
     nOffset(task.getNOffset()),
@@ -23,13 +23,11 @@ NumberWorker::NumberWorker(const TaskPerThread task, QThread &thread, QVector<qi
 
     moveToThread(&thread);
     mThreadID = globalThreadCounter++;
+    x = randSeed;
 }
 
 void NumberWorker::doWork()
 {
-    // Seed the local random generator.
-    unsigned long x = QDateTime::currentDateTime().toMSecsSinceEpoch();; // TODO: not thread safe seed.
-
     // merely for the progress signals
     const int period = 10000;
     const qint64 nStart = n;
@@ -37,7 +35,8 @@ void NumberWorker::doWork()
     for (qint64 i = maxExclusive; i > minInclusive && !mCancelled; i--)
     {
         // This is a well known linear congruential function for random number generation.
-        // Doing it locally, to avoid slow function calls. It makes it marginally faster.
+        // Doing it locally, to avoid slow function calls and even slower mutexes. This does mean the seed value needs to be different
+        // per thread.
         x = 48271 * x;
         const qint64 random = x % (i - minInclusive);
 
