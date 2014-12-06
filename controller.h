@@ -21,6 +21,8 @@ class Controller : public QObject
     ThreadSafeRandom mTsRandom;
 
     QList<TaskPerThread> getTaskDivisions(const qint64 n, const qint64 maxExclusive);
+    bool verifyUniqueness();
+    void shuffle();
 public:
     explicit Controller(const qint64 n, const qint64 maxExclusive, QObject *parent = 0);
     ~Controller();
@@ -34,7 +36,9 @@ signals:
     void operate();
     void error(QString message);
     void started();
-    void stopped();
+    void stopped(bool success);
+    void verifyProgress(int value);
+    void sortProgress(int value);
 
 private slots:
     void handleWorkerResults();

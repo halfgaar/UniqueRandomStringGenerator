@@ -52,6 +52,36 @@ QList<TaskPerThread> Controller::getTaskDivisions(const qint64 n, const qint64 m
     return result;
 }
 
+bool Controller::verifyUniqueness()
+{
+    qint64 lastOne = -1;
+    qint64 counter = 0;
+    const qint64 total = mResultList.length();
+
+    foreach(const qint64 value, mResultList)
+    {
+        if (lastOne == value)
+        {
+            emit error(QString("%1 was encountered twice.").arg(value));
+            return false;
+        }
+
+        lastOne = value;
+
+        ++counter;
+
+        int progress = (counter / (double)total) * 100;
+        emit verifyProgress(progress);
+    }
+
+    return true;
+}
+
+void Controller::shuffle()
+{
+
+}
+
 Controller::Controller(const qint64 n, const qint64 maxExclusive, QObject *parent) :
     QObject(parent),
     mNoOfThreads(QThread::idealThreadCount ()),
@@ -124,7 +154,7 @@ void Controller::cancel()
 
     mWorkersDone = 0;
     mRunning = false;
-    emit stopped();
+    emit stopped(false);
 }
 
 bool Controller::isRunning() const
@@ -138,13 +168,23 @@ void Controller::handleWorkerResults()
 
     if (mWorkersDone == mNoOfThreads)
     {
-        foreach(qint64 value, mResultList)
+        // TODO: Hmm, how am I going to emit progress events for this?
+        emit sortProgress(0);
+        std::sort(mResultList.begin(), mResultList.end());
+        emit sortProgress(100);
+
+        if (verifyUniqueness())
         {
-            qDebug() << value;
+            mRunning = false;
+            emit stopped(false);
+        }
+        else
+        {
+            mRunning = false;
+            emit stopped(true);
         }
 
-        mRunning = false;
-        emit stopped();
+        shuffle();
     }
 }
 
