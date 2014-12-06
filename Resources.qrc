@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>icons/32x32/Navigation Next.png</file>
+        <file>icons/32x32/Perspective Save.png</file>
     </qresource>
 </RCC>
