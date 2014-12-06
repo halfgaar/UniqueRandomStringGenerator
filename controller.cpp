@@ -100,6 +100,7 @@ void Controller::start()
         return;
 
     mRunning = true;
+    mWorkersDone = 0;
     emit operate(); // Not calling stuff directly on the worker because it's been moved to another thread. Instead using this queued connection.
     emit started();
 }
@@ -121,8 +122,9 @@ void Controller::cancel()
         worker->cancel();
     }
 
-    emit stopped();
+    mWorkersDone = 0;
     mRunning = false;
+    emit stopped();
 }
 
 bool Controller::isRunning() const
@@ -141,8 +143,8 @@ void Controller::handleWorkerResults()
             qDebug() << value;
         }
 
-        emit stopped();
         mRunning = false;
+        emit stopped();
     }
 }
 
