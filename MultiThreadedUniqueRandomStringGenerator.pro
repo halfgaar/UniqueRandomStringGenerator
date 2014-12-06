@@ -29,3 +29,6 @@ HEADERS  += mainwindow.h \
 
 FORMS    += mainwindow.ui \
     threadview.ui
+
+RESOURCES += \
+    Resources.qrc

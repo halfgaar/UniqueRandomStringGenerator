@@ -35,12 +35,7 @@ void MainWindow::updateInterfaceMode()
         buttonsEnabled = false;
     }
 
-    ui->btnGenerate->setEnabled(buttonsEnabled);
-}
-
-void MainWindow::on_btnGenerate_clicked()
-{
-    mController.start();
+    ui->actionGenerate->setEnabled(buttonsEnabled);
 }
 
 void MainWindow::onControllerStarted()
@@ -51,4 +46,9 @@ void MainWindow::onControllerStarted()
 void MainWindow::onControllerStopped()
 {
     updateInterfaceMode();
+}
+
+void MainWindow::on_actionGenerate_triggered()
+{
+    mController.start();
 }

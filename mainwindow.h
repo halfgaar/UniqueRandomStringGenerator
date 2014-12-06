@@ -21,9 +21,10 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_btnGenerate_clicked();
     void onControllerStarted();
     void onControllerStopped();
+
+    void on_actionGenerate_triggered();
 
 private:
     Ui::MainWindow *ui;
