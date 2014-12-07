@@ -1,6 +1,7 @@
 #include "controller.h"
 #include <QDebug>
 #include <taskperthread.h>
+#include <algorithm>
 
 /**
  * @brief Controller::getTaskDivisions generates a list of ranges for each thread to work on.
@@ -52,14 +53,23 @@ QList<TaskPerThread> Controller::getTaskDivisions(const qint64 n, const qint64 m
     return result;
 }
 
+void Controller::sort()
+{
+    // TODO: Hmm, how am I going to emit progress events for this?
+    emit sortProgress(0);
+    std::sort(&mResultList[0], &mResultList[mN]);
+    emit sortProgress(100);
+}
+
 bool Controller::verifyUniqueness()
 {
     qint64 lastOne = -1;
     qint64 counter = 0;
-    const qint64 total = mResultList.length();
 
-    foreach(const qint64 value, mResultList)
+    for(qint64 i = 0; i < mN; ++i)
     {
+        const qint64 value = mResultList[i];
+
         if (lastOne == value)
         {
             emit error(QString("%1 was encountered twice.").arg(value));
@@ -70,7 +80,7 @@ bool Controller::verifyUniqueness()
 
         ++counter;
 
-        int progress = (counter / (double)total) * 100;
+        int progress = (counter / (double)mN) * 100;
         emit verifyProgress(progress);
     }
 
@@ -86,7 +96,8 @@ Controller::Controller(const qint64 n, const qint64 maxExclusive, QObject *paren
     QObject(parent),
     mNoOfThreads(QThread::idealThreadCount ()),
     mRunning(false),
-    mResultList(n),
+    mResultList(new qint64[n]),
+    mN(n),
     mWorkersDone(0)
 {
     qRegisterMetaType<QSharedPointer<QVector<qint64> > >("QSharedPointer<QVector<qint64> >");
@@ -95,7 +106,7 @@ Controller::Controller(const qint64 n, const qint64 maxExclusive, QObject *paren
     {
         QThread * thread = new QThread(this);
         mThreads.append(thread);
-        NumberWorker * worker = new NumberWorker(task, *thread, mResultList, mTsRandom.next());
+        NumberWorker * worker = new NumberWorker(task, *thread, mResultList, mN, mTsRandom.next());
         mWorkers.append(worker);
 
         connect(this, &Controller::operate, worker, &NumberWorker::doWork);
@@ -122,6 +133,8 @@ Controller::~Controller()
         // active anymore, we can just delete it now.
         delete worker;
     }
+
+    delete[] mResultList;
 }
 
 void Controller::start()
@@ -168,23 +181,23 @@ void Controller::handleWorkerResults()
 
     if (mWorkersDone == mNoOfThreads)
     {
-        // TODO: Hmm, how am I going to emit progress events for this?
-        emit sortProgress(0);
-        std::sort(mResultList.begin(), mResultList.end());
-        emit sortProgress(100);
+        bool result = true;
 
-        if (verifyUniqueness())
-        {
-            mRunning = false;
-            emit stopped(false);
-        }
-        else
-        {
-            mRunning = false;
-            emit stopped(true);
-        }
+        sort();
+
+        if (!verifyUniqueness())
+            result = false;
 
         shuffle();
+
+        // Debug; remove later.
+        for(qint64 i = 0; i < mN; ++i)
+        {
+            qDebug() << mResultList[i];
+        }
+
+        mRunning = false;
+        emit stopped(result);
     }
 }
 

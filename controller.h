@@ -16,11 +16,13 @@ class Controller : public QObject
     QList<NumberWorker*> mWorkers;
     const int mNoOfThreads;
     bool mRunning;
-    QVector<qint64> mResultList;
+    qint64 * mResultList;
+    const qint64 mN;
     int mWorkersDone;
     ThreadSafeRandom mTsRandom;
 
     QList<TaskPerThread> getTaskDivisions(const qint64 n, const qint64 maxExclusive);
+    void sort();
     bool verifyUniqueness();
     void shuffle();
 public:

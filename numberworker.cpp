@@ -5,14 +5,15 @@
 
 int NumberWorker::globalThreadCounter = 0;
 
-NumberWorker::NumberWorker(const TaskPerThread task, QThread &thread, QVector<qint64> &totalResultList, qint64 randSeed) :
+NumberWorker::NumberWorker(const TaskPerThread task, QThread &thread, qint64 *totalResultList, const qint64 n, qint64 randSeed) :
     QObject(0), // We can't have a parent, because then we can't move to a thread.
     n(task.getN()),
     nOffset(task.getNOffset()),
     minInclusive(task.getMinInclusive()),
     maxExclusive(task.getMaxExclusive()),
     mCancelled(false),
-    mTotalResultList(totalResultList)
+    mTotalResultList(totalResultList),
+    mN(n)
 {
     if (maxExclusive < n)
     {

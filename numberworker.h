@@ -18,10 +18,11 @@ class NumberWorker : public QObject
     bool mCancelled;
     static int globalThreadCounter;
     int mThreadID;
-    QVector<qint64> &mTotalResultList;
+    qint64 * mTotalResultList;
+    const qint64 mN;
     quint64 x;
 public:
-    explicit NumberWorker(const TaskPerThread task, QThread &thread, QVector<qint64> &totalResultList, qint64 randSeed);
+    explicit NumberWorker(const TaskPerThread task, QThread &thread, qint64 * totalResultList, const qint64 n, qint64 randSeed);
     void cancel();
     int getThreadID() const;
 
