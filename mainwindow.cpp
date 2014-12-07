@@ -22,6 +22,7 @@ MainWindow::MainWindow(Controller &c, QWidget *parent) :
     connect(&c, &Controller::stopped, this, &MainWindow::onControllerStopped);
     connect(&c, SIGNAL(verifyProgress(int)), ui->prgVerify, SLOT(setValue(int)));
     connect(&c, SIGNAL(sortProgress(int)), ui->prgSort, SLOT(setValue(int)));
+    connect(&c, SIGNAL(shuffleProgress(int)), ui->prgShuffle, SLOT(setValue(int)));
 }
 
 MainWindow::~MainWindow()

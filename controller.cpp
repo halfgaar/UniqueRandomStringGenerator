@@ -104,9 +104,29 @@ bool Controller::verifyUniqueness()
     return true;
 }
 
+/**
+ * Basic Fischer-Yates shuffle
+ */
 void Controller::shuffle()
 {
+    int lastProgress = -1;
+    int counter = 1; // We start at 1, because the algorithm does n - 1 elements, because it doesn't need to swap the last one with itself.
 
+    for (int i = mN-1; i > 0; --i)
+    {
+        int j = mTsRandom.threadUnsafeNext(i + 1);
+
+        const qint64 temp = mResultList[j];
+        mResultList[j] = mResultList[i];
+        mResultList[i] = temp;
+
+        int progress = (++counter / (double)mN) * 100;
+        if (lastProgress != progress) // to avoid millions of emits.
+        {
+            lastProgress = progress;
+            emit shuffleProgress(progress);
+        }
+    }
 }
 
 Controller::Controller(const qint64 n, const qint64 maxExclusive, QObject *parent) :
@@ -124,7 +144,7 @@ Controller::Controller(const qint64 n, const qint64 maxExclusive, QObject *paren
     {
         QThread * thread = new QThread(this);
         mThreads.append(thread);
-        NumberWorker * worker = new NumberWorker(task, *thread, mResultList, mN, mTsRandom.next());
+        NumberWorker * worker = new NumberWorker(task, *thread, mResultList, mN, mTsRandom.threadSafeNext());
         mWorkers.append(worker);
 
         connect(this, &Controller::operate, worker, &NumberWorker::doWork);

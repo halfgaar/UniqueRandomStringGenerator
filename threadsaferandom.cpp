@@ -11,10 +11,16 @@ ThreadSafeRandom::ThreadSafeRandom()
 /**
  * Simple linear congruential function, as found in the art of computer programming volume 2 (TODO: expand documentation)
  */
-qint64 ThreadSafeRandom::next()
+quint64 ThreadSafeRandom::threadSafeNext()
 {
     mMutex.lock();
     x = 48271 * x;
     mMutex.unlock();
     return x;
+}
+
+quint64 ThreadSafeRandom::threadUnsafeNext(quint64 maxExclusive)
+{
+    x = 48271 * x;
+    return x % maxExclusive;
 }

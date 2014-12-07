@@ -42,6 +42,7 @@ signals:
     void stopped(bool success);
     void verifyProgress(int value);
     void sortProgress(int value);
+    void shuffleProgress(int value);
 
 private slots:
     void handleWorkerResults();

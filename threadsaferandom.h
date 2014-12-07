@@ -6,10 +6,11 @@
 class ThreadSafeRandom
 {
     QMutex mMutex;
-    qint64 x;
+    quint64 x;
 public:
     ThreadSafeRandom();
-    qint64 next();
+    quint64 threadSafeNext();
+    quint64 threadUnsafeNext(quint64 maxExclusive);
 };
 
 #endif // THREADSAFERANDOM_H
