@@ -18,6 +18,7 @@ class Controller : public QObject
     bool mRunning;
     qint64 * mResultList;
     const qint64 mN;
+    const qint64 mMaxExclusive;
     int mWorkersDone;
     ThreadSafeRandom mTsRandom;
 

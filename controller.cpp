@@ -65,6 +65,7 @@ bool Controller::verifyUniqueness()
 {
     qint64 lastOne = -1;
     qint64 counter = 0;
+    int lastProgress = -1;
 
     for(qint64 i = 0; i < mN; ++i)
     {
@@ -76,12 +77,28 @@ bool Controller::verifyUniqueness()
             return false;
         }
 
+        if (value >= mMaxExclusive)
+        {
+            emit error(QString("Found %1, which is higher than the max-exclusive limit of %2.").arg(value).arg(mMaxExclusive));
+            return false;
+        }
+
+        if (value < 0)
+        {
+            emit error(QString("Negative value found: %1").arg(value));
+            return false;
+        }
+
         lastOne = value;
 
         ++counter;
 
         int progress = (counter / (double)mN) * 100;
-        emit verifyProgress(progress);
+        if (lastProgress != progress) // to avoid millions of emits.
+        {
+            lastProgress = progress;
+            emit verifyProgress(progress);
+        }
     }
 
     return true;
@@ -98,6 +115,7 @@ Controller::Controller(const qint64 n, const qint64 maxExclusive, QObject *paren
     mRunning(false),
     mResultList(new qint64[n]),
     mN(n),
+    mMaxExclusive(maxExclusive),
     mWorkersDone(0)
 {
     qRegisterMetaType<QSharedPointer<QVector<qint64> > >("QSharedPointer<QVector<qint64> >");
