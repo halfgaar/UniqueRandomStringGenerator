@@ -148,6 +148,52 @@ void Controller::shuffle()
     }
 }
 
+QString Controller::nrToCharacterString(quint64 n) const
+{
+    if ((qint64)n >= mMaxExclusive)
+    {
+        throw std::runtime_error("Trying to convert a number outside the allowed range.");
+    }
+
+    const int base = mChars.length();
+    QString result;
+
+    while(n != 0)
+    {
+        int remainder = n % base;
+        n = n / base;
+        result.insert(0, mChars[remainder]);
+    }
+
+    result = result.rightJustified(lineLength, mChars[0]);
+    return result;
+}
+
+void Controller::saveList(QString filename) const
+{
+    QFile outputFile(filename);
+
+    if (outputFile.exists())
+    {
+        QString msg("%1 already exists. Not saving");
+        throw std::runtime_error(msg.toLatin1().data());
+    }
+
+    outputFile.open(QFile::ReadWrite);
+    QTextStream stream(&outputFile);
+
+    qDebug() << "Saving the list to " << filename;
+
+    for(qint64 i = 0; i < mN; i++)
+    {
+        quint64 value = mResultList[i];
+        QString line = nrToCharacterString(value);
+        stream << line << "\n";
+    }
+
+    qDebug() << "Done Saving the list";
+}
+
 Controller::Controller(const qint64 n, const qint64 maxExclusive, QObject *parent) :
     QObject(parent),
     mNoOfThreads(QThread::idealThreadCount ()),
@@ -155,7 +201,8 @@ Controller::Controller(const qint64 n, const qint64 maxExclusive, QObject *paren
     mResultList(new qint64[n]),
     mN(n),
     mMaxExclusive(maxExclusive),
-    mWorkersDone(0)
+    mWorkersDone(0),
+    mChars("234679acdefghjkmnpqrtxyz")
 {
     qRegisterMetaType<QSharedPointer<QVector<qint64> > >("QSharedPointer<QVector<qint64> >");
 

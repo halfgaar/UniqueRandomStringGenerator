@@ -59,6 +59,7 @@ void MainWindow::updateInterfaceMode()
     }
 
     ui->actionGenerate->setEnabled(buttonsEnabled);
+    ui->actionSave->setEnabled(buttonsEnabled);
 }
 
 void MainWindow::onControllerStarted()
@@ -74,4 +75,9 @@ void MainWindow::onControllerStopped()
 void MainWindow::on_actionGenerate_triggered()
 {
     mController.start();
+}
+
+void MainWindow::on_actionSave_triggered()
+{
+    mController.saveList("/tmp/manyrandom.txt");
 }

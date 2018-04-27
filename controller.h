@@ -23,6 +23,8 @@
 #include <QObject>
 #include <QThread>
 #include <QList>
+#include <QFile>
+#include <QByteArray>
 #include <numberworker.h>
 #include <taskperthread.h>
 #include <QVector>
@@ -40,11 +42,23 @@ class Controller : public QObject
     const qint64 mMaxExclusive;
     int mWorkersDone;
     ThreadSafeRandom mTsRandom;
+    const QByteArray mChars; // The characters of which the random strings can consist of
+    const int lineLength = 8; // Remember that you can't make strings longer if the amount of permutations exceed a 64 bit int. TODO: test it.
 
     QList<TaskPerThread> getTaskDivisions(const qint64 n, const qint64 maxExclusive);
     void sort();
     bool verifyUniqueness();
     void shuffle();
+
+    /**
+     * nrToCharacterString converts the integer based notation into base-[234679acdefghjkmnpqrtxyz] (or actually, the chars array)
+     *
+     * So, 0 would be 2. 23 would be z. 24 would be 32.
+     *
+     * Padding is also added. So, the lowest value is 22222222, meaning 0.
+     *
+     */
+    QString nrToCharacterString(quint64 n) const;
 public:
     explicit Controller(const qint64 n, const qint64 maxExclusive, QObject *parent = 0);
     ~Controller();
@@ -53,6 +67,8 @@ public:
     QList<NumberWorker*> getWorkers();
     void cancel();
     bool isRunning() const;
+
+    void saveList(QString filename) const;
 
 signals:
     void operate();
