@@ -229,10 +229,10 @@ void Controller::handleWorkerResults()
         shuffle();
 
         // Debug; remove later.
-        for(qint64 i = 0; i < mN; ++i)
-        {
-            qDebug() << mResultList[i];
-        }
+        //for(qint64 i = 0; i < mN; ++i)
+        //{
+        //    qDebug() << mResultList[i];
+        //}
 
         mRunning = false;
         emit stopped(result);
